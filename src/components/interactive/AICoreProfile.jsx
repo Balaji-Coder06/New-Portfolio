@@ -8,9 +8,7 @@ import {
   Cpu,
   Layers,
   CheckCircle2,
-  Zap,
-  ShieldCheck,
-  RotateCcw
+  ShieldCheck
 } from 'lucide-react';
 import AICoreParticles from './AICoreParticles';
 
@@ -45,7 +43,7 @@ const techBadges = [
   },
   {
     id: 'js',
-    name: 'JavaScript ES6+',
+    name: 'JavaScript',
     icon: Cpu,
     color: '#facc15',
     glowClass: 'border-amber-400/40 text-amber-200 shadow-[0_0_20px_rgba(250,204,21,0.25)] bg-amber-950/40',
@@ -63,7 +61,7 @@ const techBadges = [
   },
   {
     id: 'dsa',
-    name: 'DSA & Systems',
+    name: 'FullStack',
     icon: Code2,
     color: '#38bdf8',
     glowClass: 'border-sky-400/40 text-sky-200 shadow-[0_0_20px_rgba(56,189,248,0.25)] bg-sky-950/40',
@@ -82,22 +80,6 @@ export default function AICoreProfile() {
 
   const [isVisible, setIsVisible] = useState(true);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-
-  // ---------------------------------------------------------------------
-  // 1. SYSTEM BOOT INITIALIZATION SEQUENCE STATE
-  // Lives in src/components/interactive/AICoreProfile.jsx
-  // Uses sessionStorage so returning visitors don't have to wait every reload
-  // ---------------------------------------------------------------------
-  const [bootState, setBootState] = useState(() => {
-    try {
-      if (typeof window !== 'undefined' && sessionStorage.getItem('ai_core_booted') === 'true') {
-        return { step: 'online', progress: 100, isBooting: false };
-      }
-    } catch (e) {
-      // Ignore private browsing sessionStorage exceptions
-    }
-    return { step: 'init', progress: 0, isBooting: true };
-  });
 
   const [mousePos, setMousePos] = useState({ x: null, y: null });
   const [hoveredBadge, setHoveredBadge] = useState(null);
@@ -165,44 +147,8 @@ export default function AICoreProfile() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // ---------------------------------------------------------------------
-  // 2. SYSTEM BOOT PROGRESS TIMER LOGIC
-  // Advances bootState.progress from 0% to 100%
-  // ---------------------------------------------------------------------
-  useEffect(() => {
-    if (!bootState.isBooting) return;
-
-    const progressInterval = setInterval(() => {
-      setBootState((prev) => {
-        if (prev.progress >= 100) {
-          clearInterval(progressInterval);
-          return { step: 'complete', progress: 100, isBooting: true };
-        }
-        return { ...prev, progress: prev.progress + 5 };
-      });
-    }, 35);
-
-    return () => clearInterval(progressInterval);
-  }, [bootState.isBooting]);
-
-  useEffect(() => {
-    if (bootState.progress >= 100 && bootState.step === 'complete') {
-      const timer = setTimeout(() => {
-        setBootState({ step: 'online', progress: 100, isBooting: false });
-        try {
-          sessionStorage.setItem('ai_core_booted', 'true');
-        } catch (e) {}
-        setIsPulseActive(true);
-        setTimeout(() => setIsPulseActive(false), 1200);
-      }, 400);
-      return () => clearTimeout(timer);
-    }
-  }, [bootState.progress, bootState.step]);
-
   // Unified High-Performance GPU RAF Loop (0 React re-renders during rotation)
   useEffect(() => {
-    if (bootState.isBooting) return;
-
     let animationFrame;
     let lastTime = performance.now();
 
@@ -271,11 +217,11 @@ export default function AICoreProfile() {
       animationFrame = requestAnimationFrame(renderLoop);
     }
     return () => cancelAnimationFrame(animationFrame);
-  }, [isVisible, bootState.isBooting, prefersReducedMotion, orbitRadius]);
+  }, [isVisible, prefersReducedMotion, orbitRadius]);
 
   // Holographic Laser Scan Interval (8.5s)
   useEffect(() => {
-    if (!isVisible || bootState.isBooting) return;
+    if (!isVisible) return;
 
     const scanInterval = setInterval(() => {
       setIsScanning(true);
@@ -283,7 +229,7 @@ export default function AICoreProfile() {
     }, 8500);
 
     return () => clearInterval(scanInterval);
-  }, [isVisible, bootState.isBooting]);
+  }, [isVisible]);
 
   const mouseMoveFrameRef = useRef(null);
 
@@ -337,23 +283,6 @@ export default function AICoreProfile() {
     }, 1200);
   };
 
-  // Re-trigger Startup Boot Sequence Animation manually
-  const handleRebootCore = (e) => {
-    e.stopPropagation();
-    try {
-      sessionStorage.removeItem('ai_core_booted');
-    } catch (err) {}
-    setBootState({ step: 'init', progress: 0, isBooting: true });
-  };
-
-  const getBootStatusText = (progress) => {
-    if (progress < 25) return 'Loading Neural Engine...';
-    if (progress < 50) return 'Loading UI Components...';
-    if (progress < 75) return 'Loading Skill Badges...';
-    if (progress < 100) return 'Loading Telemetry Matrix...';
-    return 'System Online ✓';
-  };
-
   const currentHoveredColor = hoveredBadge ? techBadges.find(b => b.id === hoveredBadge)?.color || '#06b6d4' : '#06b6d4';
 
   return (
@@ -369,48 +298,10 @@ export default function AICoreProfile() {
         className="relative w-full h-full flex items-center justify-center transform-gpu will-change-transform"
       >
         {/* Background Canvas Particles */}
-        <AICoreParticles mousePos={mousePos} active={!bootState.isBooting && isVisible} />
+        <AICoreParticles mousePos={mousePos} active={isVisible} />
 
         {/* Ambient Breathing Background Aura */}
         <div className="absolute w-64 h-64 sm:w-96 sm:h-96 rounded-full bg-gradient-to-tr from-cyan-500/20 via-emerald-500/15 to-blue-600/20 blur-3xl pointer-events-none animate-pulse" />
-
-        {/* ------------------------------------------------------------- */}
-        {/* 3. SYSTEM BOOT OVERLAY COMPONENT (Visual GUI overlay during initialization) */}
-        {/* ------------------------------------------------------------- */}
-        <AnimatePresence>
-          {bootState.isBooting && (
-            <motion.div
-              initial={{ opacity: 1, scale: 0.95 }}
-              exit={{ opacity: 0, scale: 1.12, filter: 'blur(8px)' }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute inset-0 z-50 flex flex-col items-center justify-center p-6 glass-panel rounded-3xl border border-cyan-500/30 bg-neutral-950/90 backdrop-blur-2xl shadow-[0_0_50px_rgba(6,182,212,0.25)]"
-            >
-              <div className="flex items-center gap-2 mb-4 text-cyan-400 font-mono text-xs tracking-widest uppercase font-bold animate-pulse">
-                <Zap className="w-4 h-4 text-cyan-400" />
-                <span>Core Initializing...</span>
-              </div>
-
-              <div className="w-full max-w-xs bg-neutral-900/90 border border-neutral-800 rounded-xl p-4 font-mono text-xs shadow-inner">
-                <div className="flex justify-between text-neutral-400 mb-2 text-[11px]">
-                  <span>CORE_OS v2.4</span>
-                  <span className="text-cyan-400 font-bold">{bootState.progress}%</span>
-                </div>
-
-                <div className="h-3 w-full bg-neutral-950 rounded-md overflow-hidden p-0.5 border border-neutral-800 flex items-center mb-3">
-                  <div
-                    className="h-full bg-gradient-to-r from-cyan-500 via-emerald-400 to-blue-500 rounded transition-all duration-75 shadow-[0_0_10px_#06b6d4]"
-                    style={{ width: `${bootState.progress}%` }}
-                  />
-                </div>
-
-                <div className="text-emerald-400 font-semibold flex items-center gap-1.5 text-[11px]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                  <span>{getBootStatusText(bootState.progress)}</span>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         {/* CONCENTRIC HUD RINGS */}
         {/* 1. INNER RING */}
@@ -574,16 +465,11 @@ export default function AICoreProfile() {
                 )}
               </AnimatePresence>
 
-              {/* CORE ONLINE / REBOOT STATUS BUTTON */}
-              <button
-                onClick={handleRebootCore}
-                title="Click to Reboot & Re-trigger Startup Sequence Animation"
-                className="absolute bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 glass-panel px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full border border-emerald-500/40 text-[9px] sm:text-[11px] font-mono text-emerald-300 flex items-center gap-1.5 shadow-xl z-20 hover:border-cyan-400 hover:text-cyan-300 transition-colors group/reboot"
-              >
-                <CheckCircle2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-400 animate-pulse group-hover/reboot:hidden" />
-                <RotateCcw className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-cyan-400 hidden group-hover/reboot:block animate-spin" />
-                <span className="group-hover/reboot:text-cyan-300">CORE ONLINE</span>
-              </button>
+              {/* CORE ONLINE STATUS BADGE */}
+              <div className="absolute bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 glass-panel px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full border border-emerald-500/40 text-[9px] sm:text-[11px] font-mono text-emerald-300 flex items-center gap-1.5 shadow-xl z-20">
+                <CheckCircle2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-400 animate-pulse" />
+                <span>CORE ONLINE</span>
+              </div>
             </div>
           </div>
 
@@ -601,70 +487,69 @@ export default function AICoreProfile() {
         </motion.div>
 
         {/* ORBITING TECHNOLOGY BADGES */}
-        {!bootState.isBooting &&
-          techBadges.map((badge, idx) => {
-            const Icon = badge.icon;
-            const isHovered = hoveredBadge === badge.id;
-            const isPulsing = pulsingBadgeIndex === idx;
+        {techBadges.map((badge, idx) => {
+          const Icon = badge.icon;
+          const isHovered = hoveredBadge === badge.id;
+          const isPulsing = pulsingBadgeIndex === idx;
 
-            const totalBadges = techBadges.length;
-            const baseAngle = (idx / totalBadges) * Math.PI * 2;
-            const initX = (orbitRadius * Math.cos(baseAngle)).toFixed(2);
-            const initY = (orbitRadius * Math.sin(baseAngle)).toFixed(2);
+          const totalBadges = techBadges.length;
+          const baseAngle = (idx / totalBadges) * Math.PI * 2;
+          const initX = (orbitRadius * Math.cos(baseAngle)).toFixed(2);
+          const initY = (orbitRadius * Math.sin(baseAngle)).toFixed(2);
 
-            return (
-              <div
-                key={badge.id}
-                ref={(el) => (badgeNodeRefs.current[idx] = el)}
-                className="absolute top-1/2 left-1/2 z-40 transform-gpu will-change-transform"
-                style={{
-                  transform: `translate3d(${initX}px, ${initY}px, 0px) translate(-50%, -50%)`
+          return (
+            <div
+              key={badge.id}
+              ref={(el) => (badgeNodeRefs.current[idx] = el)}
+              className="absolute top-1/2 left-1/2 z-40 transform-gpu will-change-transform"
+              style={{
+                transform: `translate3d(${initX}px, ${initY}px, 0px) translate(-50%, -50%)`
+              }}
+            >
+              <motion.div
+                onMouseEnter={() => setHoveredBadge(badge.id)}
+                onMouseLeave={() => setHoveredBadge(null)}
+                animate={{
+                  scale: isHovered ? 1.2 : isPulsing ? 1.15 : 1,
                 }}
+                transition={{ type: 'spring', stiffness: 280, damping: 18 }}
+                className={`relative px-2 py-1 sm:px-3.5 sm:py-2 rounded-xl border backdrop-blur-xl font-mono text-[10px] sm:text-xs font-bold flex items-center gap-1.5 sm:gap-2 cursor-pointer transition-all duration-300 ${
+                  badge.glowClass
+                } ${isPulsing ? 'ring-2 ring-cyan-400 shadow-[0_0_20px_#06b6d4]' : ''}`}
               >
-                <motion.div
-                  onMouseEnter={() => setHoveredBadge(badge.id)}
-                  onMouseLeave={() => setHoveredBadge(null)}
-                  animate={{
-                    scale: isHovered ? 1.2 : isPulsing ? 1.15 : 1,
-                  }}
-                  transition={{ type: 'spring', stiffness: 280, damping: 18 }}
-                  className={`relative px-2 py-1 sm:px-3.5 sm:py-2 rounded-xl border backdrop-blur-xl font-mono text-[10px] sm:text-xs font-bold flex items-center gap-1.5 sm:gap-2 cursor-pointer transition-all duration-300 ${
-                    badge.glowClass
-                  } ${isPulsing ? 'ring-2 ring-cyan-400 shadow-[0_0_20px_#06b6d4]' : ''}`}
-                >
-                  <Icon className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" style={{ color: badge.color }} />
-                  <span className="whitespace-nowrap">{badge.name}</span>
+                <Icon className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" style={{ color: badge.color }} />
+                <span className="whitespace-nowrap">{badge.name}</span>
 
-                  <AnimatePresence>
-                    {isHovered && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 8, scale: 0.9 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 4, scale: 0.95 }}
-                        transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                        className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-48 sm:w-56 p-2.5 sm:p-3 rounded-2xl glass-panel border border-cyan-500/40 bg-neutral-950/95 backdrop-blur-2xl shadow-[0_10px_30px_rgba(0,0,0,0.8)] text-left pointer-events-none z-50"
-                      >
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-bold text-xs text-neutral-100">{badge.name}</span>
-                          <span className="text-[9px] sm:text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
-                            {badge.years}
-                          </span>
-                        </div>
-                        <p className="text-[10px] sm:text-[11px] text-neutral-300 leading-snug font-sans font-normal">
-                          {badge.description}
-                        </p>
-                        <div className="mt-2 pt-1.5 border-t border-neutral-800 flex items-center gap-1 text-[9px] sm:text-[10px] text-emerald-400 font-mono">
-                          <ShieldCheck className="w-3 h-3 text-emerald-400" />
-                          <span>Core Competency Verified</span>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
+                <AnimatePresence>
+                  {isHovered && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.9 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 4, scale: 0.95 }}
+                      transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                      className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-48 sm:w-56 p-2.5 sm:p-3 rounded-2xl glass-panel border border-cyan-500/40 bg-neutral-950/95 backdrop-blur-2xl shadow-[0_10px_30px_rgba(0,0,0,0.8)] text-left pointer-events-none z-50"
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-bold text-xs text-neutral-100">{badge.name}</span>
+                        <span className="text-[9px] sm:text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
+                          {badge.years}
+                        </span>
+                      </div>
+                      <p className="text-[10px] sm:text-[11px] text-neutral-300 leading-snug font-sans font-normal">
+                        {badge.description}
+                      </p>
+                      <div className="mt-2 pt-1.5 border-t border-neutral-800 flex items-center gap-1 text-[9px] sm:text-[10px] text-emerald-400 font-mono">
+                        <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                        <span>Core Competency Verified</span>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            </div>
+          );
+        })}
               </div>
-            );
-          })}
-      </div>
 
       <style>{`
         @keyframes beamFlow {
