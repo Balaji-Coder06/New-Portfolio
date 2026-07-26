@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://balaji-coder06.github.io/Portfolio/sitemap.xml
