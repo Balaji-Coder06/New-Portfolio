@@ -19,6 +19,7 @@
 
   html {
     scroll-behavior: auto !important;
+    touch-action: manipulation;
   }
 
   body {
@@ -28,6 +29,9 @@
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    -webkit-tap-highlight-color: transparent;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
   /* Lenis smooth scroll essential styles */
@@ -46,7 +50,8 @@
 
   /* Custom Scrollbar */
   ::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
+    height: 6px;
   }
   ::-webkit-scrollbar-track {
     background: #09090d;
@@ -114,4 +119,3 @@
   will-change: transform;
   backface-visibility: hidden;
 }
-

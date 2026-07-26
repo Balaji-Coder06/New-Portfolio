@@ -11,14 +11,18 @@ export const useLenis = () => useContext(LenisContext);
 
 export default function SmoothScrollProvider({ children }) {
   useEffect(() => {
+    // Check if current device is a mobile / touch device
+    const isTouch = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+
     const lenis = new Lenis({
-      duration: 1.0,
+      duration: isTouch ? 0.8 : 1.0,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
       wheelMultiplier: 1.0,
-      touchMultiplier: 1.5,
+      touchMultiplier: 1.0,
+      smoothTouch: false, // Use native touch inertia on mobile for 120Hz ProMotion smoothness
       infinite: false,
     });
 

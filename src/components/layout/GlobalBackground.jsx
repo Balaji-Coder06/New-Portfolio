@@ -35,6 +35,7 @@ export default function GlobalBackground() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     let width = window.innerWidth;
     let height = window.innerHeight;
+    const isMobile = width < 768;
 
     const updateCanvasSize = () => {
       width = window.innerWidth;
@@ -49,8 +50,8 @@ export default function GlobalBackground() {
     updateCanvasSize();
     window.addEventListener('resize', updateCanvasSize, { passive: true });
 
-    // Cosmic Stars (180 stars optimized for speed & smooth rendering)
-    const starCount = 180;
+    // Cosmic Stars (75 stars on mobile for locked 120 FPS, 180 on desktop)
+    const starCount = isMobile ? 75 : 180;
     const starColors = ['#ffffff', '#a7f3d0', '#bae6fd', '#ddd6fe', '#fef08a'];
 
     const stars = Array.from({ length: starCount }, () => {
@@ -72,6 +73,7 @@ export default function GlobalBackground() {
     let activeAsteroids = [];
 
     const spawnAsteroid = () => {
+      if (isMobile && activeAsteroids.length > 0) return; // Limit asteroids on mobile
       const startFromLeft = Math.random() > 0.3;
       const startX = startFromLeft ? Math.random() * (width * 0.6) : Math.random() * width;
       const startY = Math.random() * (height * 0.25);
@@ -84,7 +86,7 @@ export default function GlobalBackground() {
         y: startY,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
-        length: Math.random() * 120 + 100,
+        length: Math.random() * 100 + 80,
         thickness: Math.random() * 2 + 1.5,
         color: Math.random() > 0.5 ? '#38bdf8' : '#34d399',
         headColor: '#ffffff',
@@ -96,9 +98,9 @@ export default function GlobalBackground() {
 
     const initialTeaserTimer = setTimeout(() => {
       spawnAsteroid();
-    }, 3000);
+    }, 4000);
 
-    const ASTEROID_INTERVAL_MS = 130000;
+    const ASTEROID_INTERVAL_MS = 140000;
     const asteroidInterval = setInterval(() => {
       spawnAsteroid();
     }, ASTEROID_INTERVAL_MS);
@@ -130,7 +132,7 @@ export default function GlobalBackground() {
         ctx.globalAlpha = clampedAlpha;
         ctx.fill();
 
-        if (s.hasGlow) {
+        if (s.hasGlow && !isMobile) {
           ctx.beginPath();
           ctx.arc(s.x, s.y, s.radius * 2.4, 0, Math.PI * 2);
           ctx.fillStyle = s.color;
@@ -200,7 +202,7 @@ export default function GlobalBackground() {
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-[#050508]">
       
-      {/* 1. Deep Space Cosmic Nebula Gradients (Pre-softened radial gradients, 0 GPU blur penalty) */}
+      {/* 1. Deep Space Cosmic Nebula Gradients */}
       <div className="absolute inset-0 opacity-60 mix-blend-screen pointer-events-none">
         {/* Emerald Nebula */}
         <motion.div
@@ -257,10 +259,10 @@ export default function GlobalBackground() {
         />
       </div>
 
-      {/* 2. Interactive Cosmic Cursor Spotlight (Direct DOM manipulation for 0 React re-renders) */}
+      {/* 2. Interactive Cosmic Cursor Spotlight */}
       <div
         ref={spotlightRef}
-        className="absolute inset-0 transition-opacity duration-300 z-10 pointer-events-none"
+        className="absolute inset-0 transition-opacity duration-300 z-10 pointer-events-none hidden md:block"
       />
 
       {/* 3. High-DPI 60-120 FPS Galaxy Canvas */}
