@@ -444,11 +444,11 @@ export default function AICoreProfile() {
               
               {/* Profile Avatar Image */}
               <img
-                src="/hero_developer_avatar.jpg"
+                src={import.meta.env.BASE_URL ? `${import.meta.env.BASE_URL.replace(/\/$/, '')}/hero_developer_avatar.jpg` : './hero_developer_avatar.jpg'}
                 alt="S Balaji Developer Avatar"
                 className="w-full h-full object-cover rounded-full filter contrast-105 brightness-95 group-hover:scale-105 group-hover:brightness-105 transition-all duration-500"
                 onError={(e) => {
-                  e.target.src = '/hero_developer_avatar.png';
+                  e.target.src = import.meta.env.BASE_URL ? `${import.meta.env.BASE_URL.replace(/\/$/, '')}/hero_developer_avatar.png` : './hero_developer_avatar.png';
                 }}
               />
 

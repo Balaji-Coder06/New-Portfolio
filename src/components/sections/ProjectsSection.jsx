@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ExternalLink, Search, Sparkles, Layers, ArrowUpRight, CheckCircle2, Star, Eye, Code, Filter, RefreshCw } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -9,6 +9,46 @@ import Button from '../ui/Button';
 import Magnetic from '../ui/Magnetic';
 import { projectsData } from '../../data/portfolioData';
 import { GithubIcon } from '../ui/SocialIcons';
+
+// Base Asset URL helper for GitHub Pages & subpath hosting compatibility
+const getAssetUrl = (path) => {
+  if (!path) return '';
+  if (path.startsWith('http')) return path;
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  const base = import.meta.env.BASE_URL || './';
+  return base.endsWith('/') ? `${base}${cleanPath}` : `${base}/${cleanPath}`;
+};
+
+// Fail-proof image renderer with automatic asset path resolution & fallback preview
+function ProjectImage({ src, alt, className }) {
+  const [imageError, setImageError] = useState(false);
+  const resolvedSrc = getAssetUrl(src);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [src]);
+
+  if (imageError || !src) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-neutral-900 via-neutral-950 to-neutral-900 border border-neutral-800/60 p-4 text-center select-none">
+        <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-2 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+          <Sparkles className="w-6 h-6 animate-pulse text-emerald-400" />
+        </div>
+        <span className="text-xs font-mono font-bold text-neutral-200">{alt}</span>
+        <span className="text-[10px] font-mono text-emerald-400/80 mt-0.5">Interactive Preview</span>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={resolvedSrc}
+      alt={alt}
+      onError={() => setImageError(true)}
+      className={className}
+    />
+  );
+}
 
 // Enhanced project dataset with visual previews, carousel views, and status metadata
 const enhancedProjects = projectsData.map((project) => {
@@ -228,6 +268,7 @@ export default function ProjectsSection() {
                           <button
                             key={tab.label}
                             onClick={() => setFeaturedTabIdx(idx)}
+                            onMouseEnter={() => setFeaturedTabIdx(idx)}
                             className={`px-2.5 py-0.5 rounded text-[11px] font-mono transition-all ${
                               featuredTabIdx === idx
                                 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm font-semibold'
@@ -244,8 +285,8 @@ export default function ProjectsSection() {
                   </div>
 
                   {/* Product Image */}
-                  <div className="relative aspect-[16/10] overflow-hidden group">
-                    <img
+                  <div className="relative aspect-[16/10] overflow-hidden group bg-neutral-950">
+                    <ProjectImage
                       src={featuredProject.carousel ? featuredProject.carousel[featuredTabIdx]?.image || featuredProject.image : featuredProject.image}
                       alt={featuredProject.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 filter contrast-[1.05]"
@@ -381,8 +422,8 @@ export default function ProjectsSection() {
                         </div>
 
                         {/* Image Preview */}
-                        <div className="relative aspect-[16/10] overflow-hidden">
-                          <img
+                        <div className="relative aspect-[16/10] overflow-hidden bg-neutral-950">
+                          <ProjectImage
                             src={currentSlide ? currentSlide.image : project.image}
                             alt={project.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -396,6 +437,7 @@ export default function ProjectsSection() {
                               <button
                                 key={tab.label}
                                 onClick={() => setActiveTabMap({ ...activeTabMap, [project.id]: idx })}
+                                onMouseEnter={() => setActiveTabMap({ ...activeTabMap, [project.id]: idx })}
                                 className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors ${
                                   activeTabIdx === idx
                                     ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
