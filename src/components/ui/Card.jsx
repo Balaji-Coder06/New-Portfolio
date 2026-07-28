@@ -96,7 +96,7 @@ const Card = memo(function Card({
       }}
       className={twMerge(
         clsx(
-          'glass-card rounded-2xl p-6 relative overflow-hidden transition-colors duration-300 transform-gpu gpu-accelerated',
+          'glass-card rounded-2xl p-6 relative [clip-path:inset(0_round_1rem)] transition-colors duration-300 transform-gpu gpu-accelerated',
           hoverEffect && 'hover:border-emerald-500/40 hover:shadow-2xl hover:shadow-emerald-500/15',
           className
         )

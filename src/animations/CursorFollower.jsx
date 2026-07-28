@@ -27,11 +27,12 @@ export default function CursorFollower() {
 
     const onMouseOver = (e) => {
       const target = e.target;
-      if (target && target.closest && target.closest('a, button, [data-interactive="true"]')) {
-        setIsHovered(true);
-      } else {
-        setIsHovered(false);
-      }
+      const isInteractive = target && target.closest && target.closest('a, button, [data-interactive="true"]');
+      setIsHovered((prev) => {
+        if (isInteractive && !prev) return true;
+        if (!isInteractive && prev) return false;
+        return prev;
+      });
     };
 
     window.addEventListener('mousemove', onMouseMove, { passive: true });

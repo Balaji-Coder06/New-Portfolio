@@ -161,10 +161,10 @@ export default function ProjectsSection() {
           transition={{ duration: 0.7 }}
           className="mb-16"
         >
-          <Card tiltMax={8} className="p-6 sm:p-8 rounded-3xl border border-emerald-500/30 shadow-2xl relative overflow-hidden group">
+          <Card tiltMax={8} className="p-6 sm:p-8 rounded-3xl border border-emerald-500/30 shadow-2xl relative group">
             
             {/* Background Ambient Glow */}
-            <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none group-hover:scale-125 transition-transform duration-700" />
+            <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity duration-700" style={{ willChange: 'opacity' }} />
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               

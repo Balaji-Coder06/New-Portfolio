@@ -13,6 +13,7 @@ import DeveloperDashboardSection from './components/sections/DeveloperDashboardS
 import ContactSection from './components/sections/ContactSection';
 import CodeTerminalModal from './components/interactive/CodeTerminalModal';
 import InitialLoader from './components/interactive/InitialLoader';
+import MusicPlayer from './components/interactive/MusicPlayer';
 
 export default function App() {
   const [terminalOpen, setTerminalOpen] = useState(false);
@@ -59,6 +60,9 @@ export default function App() {
 
         {/* Footer */}
         <Footer />
+
+        {/* Global Floating Cyber Glass Music Player */}
+        {!initialLoading && <MusicPlayer />}
 
         {/* CLI Terminal Modal */}
         <CodeTerminalModal
