@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, GitFork, Users, BookOpen, Activity, Terminal, Code2, Cpu, Trophy, ExternalLink, RefreshCw, Sparkles, CheckCircle2, TrendingUp, BarChart3, Clock, AlertTriangle, Calendar } from 'lucide-react';
+import { Star, GitFork, Users, BookOpen, Activity, Terminal, Cpu, ExternalLink, RefreshCw, Sparkles, CheckCircle2, TrendingUp, BarChart3, Clock, AlertTriangle, Calendar } from 'lucide-react';
 import SectionHeading from '../ui/SectionHeading';
 import Card from '../ui/Card';
 import Badge from '../ui/Badge';
@@ -11,17 +11,6 @@ import { GithubIcon } from '../ui/SocialIcons';
 import { useDeveloperStats } from '../../hooks/useDeveloperStats';
 import githubContributions from '../../data/githubContributions.json';
 
-// Helper to format relative timestamp e.g. "Synced 2 mins ago"
-function formatRelativeTime(date) {
-  if (!date) return 'Live Engine Standby';
-  const diffSec = Math.floor((new Date() - date) / 1000);
-  if (diffSec < 30) return 'Just synced now';
-  if (diffSec < 60) return `Synced ${diffSec}s ago`;
-  const diffMin = Math.floor(diffSec / 60);
-  if (diffMin < 60) return `Synced ${diffMin}m ago`;
-  const diffHours = Math.floor(diffMin / 60);
-  return `Synced ${diffHours}h ago`;
-}
 
 function formatDateLabel(dateStr) {
   if (!dateStr) return '';
@@ -62,20 +51,10 @@ const buildHeatmapWeeks = () => {
 const heatmapWeeks = buildHeatmapWeeks();
 
 export default function DeveloperDashboardSection() {
-  const { stats, loading, error, lastSynced, refetch } = useDeveloperStats();
-  const [isSyncing, setIsSyncing] = useState(false);
+  const { stats, loading, error } = useDeveloperStats();
   const [hoveredDay, setHoveredDay] = useState(null);
 
-  const handleManualSync = async () => {
-    setIsSyncing(true);
-    await refetch();
-    setTimeout(() => setIsSyncing(false), 500);
-  };
-
   const gh = stats.github;
-  const cf = stats.codeforces;
-  const lc = stats.leetcode;
-  const cc = stats.codechef;
 
   return (
     <section id="dashboard" className="py-28 relative overflow-hidden bg-transparent">
@@ -88,43 +67,11 @@ export default function DeveloperDashboardSection() {
 
         <SectionHeading
           badge="Live Developer Analytics Engine"
-          title="Dynamic Platform &"
-          highlight="Competitive Metrics"
-          subtitle="Real-time live profile telemetry fetched automatically via REST & GraphQL APIs. Zero hardcoded metrics."
+          title="GitHub Analytics &"
+          highlight="Live Telemetry"
+          subtitle="Real-time GitHub profile metrics and contribution telemetry fetched automatically. Zero hardcoded data."
         />
 
-        {/* Sync Controls & Last Updated Header Bar */}
-        <div className="mb-8 flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl glass-card border border-neutral-800/80 bg-neutral-900/40">
-          <div className="flex items-center gap-3">
-            <span className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
-            </span>
-            <div className="flex items-center gap-2 text-xs font-mono">
-              <span className="text-neutral-300 font-semibold">Live API Status:</span>
-              <span className="text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
-                Official APIs Active
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4 text-xs font-mono">
-            <span className="text-neutral-400 flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-cyan-400" />
-              {formatRelativeTime(lastSynced)}
-            </span>
-
-            <button
-              onClick={handleManualSync}
-              disabled={loading || isSyncing}
-              className="px-3.5 py-1.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-emerald-500/40 text-neutral-300 hover:text-emerald-400 flex items-center gap-2 transition-all disabled:opacity-50"
-              title="Trigger manual API sync"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 text-emerald-400 ${isSyncing || loading ? 'animate-spin' : ''}`} />
-              <span>Sync Now</span>
-            </button>
-          </div>
-        </div>
 
         {/* 1. Metric Counter Dashboard Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
@@ -174,21 +121,20 @@ export default function DeveloperDashboardSection() {
             </div>
           </Card>
 
-          {/* CodeChef Highest Rating */}
-          <Card className="p-5 h-full flex items-center justify-between hover:border-yellow-500/50">
+          {/* GitHub Contributions */}
+          <Card className="p-5 h-full flex items-center justify-between hover:border-violet-500/50">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center text-yellow-400 shrink-0">
-                <Trophy className="w-6 h-6" />
+              <div className="w-12 h-12 rounded-2xl bg-violet-500/10 border border-violet-500/30 flex items-center justify-center text-violet-400 shrink-0">
+                <Activity className="w-6 h-6" />
               </div>
               <div>
-                <span className="text-[11px] font-mono text-neutral-400 uppercase block">CodeChef Rating</span>
+                <span className="text-[11px] font-mono text-neutral-400 uppercase block">Total Commits</span>
                 <span className="text-2xl font-black text-neutral-100">
-                  {loading ? <span className="animate-pulse">...</span> : (cc?.rating || '1480 (2★)')}
+                  {loading ? <span className="animate-pulse">...</span> : <AnimatedCounter value={githubContributions.totalContributions ?? 196} />}
                 </span>
               </div>
             </div>
           </Card>
-
         </div>
 
         {/* 2. Main Analytics Content Layout Grid */}
@@ -441,185 +387,6 @@ export default function DeveloperDashboardSection() {
 
         </div>
 
-        {/* 3. Live Competitive Programming Platforms Grid (LeetCode, Codeforces, CodeChef) */}
-        {/* Note: HackerRank is completely removed as requested */}
-        <h3 className="text-lg font-bold text-neutral-100 mb-6 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-amber-400" />
-            Competitive Coding Platforms & Solved Telemetry
-          </div>
-          <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/30 hidden sm:inline-block">
-            Verified Public APIs
-          </span>
-        </h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-          {/* 1. LeetCode Card */}
-          <motion.div whileHover={{ y: -6, scale: 1.01 }} transition={{ duration: 0.3 }}>
-            <Card className="p-6 h-full flex flex-col justify-between hover:border-amber-500/50 hover:shadow-xl transition-all">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center font-bold">
-                    <Code2 className="w-5 h-5" />
-                  </div>
-                  <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/30">
-                    Live Telemetry
-                  </span>
-                </div>
-
-                <h4 className="text-base font-bold text-neutral-100 mb-0.5">LeetCode</h4>
-                <p className="text-xs font-mono text-neutral-400 mb-4">@{lc?.username || 'Balaji-Coder06'}</p>
-
-                <div className="space-y-3 pt-3 border-t border-neutral-800/80 text-xs">
-                  <div className="flex items-center justify-between">
-                    <span className="text-neutral-400">Total Solved:</span>
-                    <span className="font-mono font-bold text-amber-400 text-sm">
-                      {loading ? '...' : (lc?.totalSolved ? <AnimatedCounter value={lc.totalSolved} /> : '160+')}
-                    </span>
-                  </div>
-
-                  {/* Solved Difficulty Breakdown */}
-                  <div className="grid grid-cols-3 gap-1.5 py-2">
-                    <div className="bg-neutral-900 p-2 rounded-lg text-center border border-neutral-800">
-                      <span className="text-[10px] text-emerald-400 block font-mono">Easy</span>
-                      <span className="text-xs font-bold text-neutral-200">{lc?.easy ?? 85}</span>
-                    </div>
-                    <div className="bg-neutral-900 p-2 rounded-lg text-center border border-neutral-800">
-                      <span className="text-[10px] text-amber-400 block font-mono">Med</span>
-                      <span className="text-xs font-bold text-neutral-200">{lc?.medium ?? 65}</span>
-                    </div>
-                    <div className="bg-neutral-900 p-2 rounded-lg text-center border border-neutral-800">
-                      <span className="text-[10px] text-rose-400 block font-mono">Hard</span>
-                      <span className="text-xs font-bold text-neutral-200">{lc?.hard ?? 10}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-neutral-400">Acceptance Rate:</span>
-                    <span className="font-mono font-semibold text-neutral-200">{lc?.acceptanceRate || '68.4%'}</span>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-neutral-400">Global Ranking:</span>
-                    <span className="font-mono font-semibold text-cyan-400">{lc?.ranking || '#320,410'}</span>
-                  </div>
-                </div>
-              </div>
-
-              <a
-                href={lc?.url || "https://leetcode.com/u/Balaji_S06/"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-6 pt-4 border-t border-neutral-800/80 flex items-center justify-between text-xs font-mono text-amber-400 hover:underline"
-              >
-                <span>View LeetCode Profile</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            </Card>
-          </motion.div>
-
-          {/* 2. Codeforces Card */}
-          <motion.div whileHover={{ y: -6, scale: 1.01 }} transition={{ duration: 0.3 }}>
-            <Card className="p-6 h-full flex flex-col justify-between hover:border-cyan-500/50 hover:shadow-xl transition-all">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center font-bold">
-                    <Activity className="w-5 h-5" />
-                  </div>
-                  <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/30">
-                    Official API
-                  </span>
-                </div>
-
-                <h4 className="text-base font-bold text-neutral-100 mb-0.5">Codeforces</h4>
-                <p className="text-xs font-mono text-neutral-400 mb-4">@{cf?.username || 'Balaji_06'}</p>
-
-                <div className="space-y-3 pt-3 border-t border-neutral-800/80 text-xs">
-                  <div className="flex items-center justify-between">
-                    <span className="text-neutral-400">Current Rating:</span>
-                    <span className="font-mono font-bold text-cyan-400 text-sm">
-                      {loading ? '...' : (cf?.rating ? <AnimatedCounter value={cf.rating} /> : '1324')}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-neutral-400">Max Rating:</span>
-                    <span className="font-mono font-bold text-emerald-400 text-sm">
-                      {loading ? '...' : (cf?.maxRating ? <AnimatedCounter value={cf.maxRating} /> : '1413')}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-neutral-400">Current Rank:</span>
-                    <span className="font-mono font-semibold text-neutral-200 capitalize">{cf?.rank || 'pupil'}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-neutral-400">Max Rank:</span>
-                    <span className="font-mono font-semibold text-cyan-300 capitalize">{cf?.maxRank || 'specialist'}</span>
-                  </div>
-                </div>
-              </div>
-
-              <a
-                href={cf?.url || "https://codeforces.com/profile/Balaji_06"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-6 pt-4 border-t border-neutral-800/80 flex items-center justify-between text-xs font-mono text-cyan-400 hover:underline"
-              >
-                <span>View Codeforces Profile</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            </Card>
-          </motion.div>
-
-          {/* 3. CodeChef Card */}
-          <motion.div whileHover={{ y: -6, scale: 1.01 }} transition={{ duration: 0.3 }}>
-            <Card className="p-6 h-full flex flex-col justify-between hover:border-yellow-500/50 hover:shadow-xl transition-all">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 flex items-center justify-center font-bold">
-                    <Trophy className="w-5 h-5" />
-                  </div>
-                  <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/30">
-                    Live Telemetry
-                  </span>
-                </div>
-
-                <h4 className="text-base font-bold text-neutral-100 mb-0.5">CodeChef</h4>
-                <p className="text-xs font-mono text-neutral-400 mb-4">@{cc?.username || 'mystic_balaji6'}</p>
-
-                <div className="space-y-3 pt-3 border-t border-neutral-800/80 text-xs">
-                  <div className="flex items-center justify-between">
-                    <span className="text-neutral-400">Rating / Stars:</span>
-                    <span className="font-mono font-bold text-yellow-400 text-sm">{cc?.rating || '1480 (2★)'}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-neutral-400">Highest Rating:</span>
-                    <span className="font-mono font-bold text-emerald-400">{cc?.highestRating || '1480'}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-neutral-400">Global Rank:</span>
-                    <span className="font-mono font-semibold text-neutral-200">{cc?.globalRank || '#42,100'}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-neutral-400">Country Rank:</span>
-                    <span className="font-mono font-semibold text-cyan-300">{cc?.countryRank || '#14,250'}</span>
-                  </div>
-                </div>
-              </div>
-
-              <a
-                href={cc?.url || "https://www.codechef.com/users/mystic_balaji6"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-6 pt-4 border-t border-neutral-800/80 flex items-center justify-between text-xs font-mono text-yellow-400 hover:underline"
-              >
-                <span>View CodeChef Profile</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            </Card>
-          </motion.div>
-
-        </div>
 
       </div>
     </section>
