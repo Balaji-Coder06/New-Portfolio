@@ -54,7 +54,7 @@ export const projectsData = [
     category: "Web Application",
     tags: ["React", "Vite", "TailwindCSS", "Framer Motion", "GSAP", "Lenis"],
     github: "https://github.com/Balaji-Coder06/New-Portfolio",
-    live: "https://portfolio-weld-seven-35.vercel.app/",
+    live: "https://sbalajiportfolio.is-a.dev/",
     image: "/portfolio_preview.png",
     featured: true,
     accentColor: "#10b981",

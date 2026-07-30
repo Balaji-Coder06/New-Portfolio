@@ -44,7 +44,7 @@ export function useDeveloperStats() {
         fetch('https://codeforces.com/api/user.info?handles=Balaji_06').then(r => r.ok ? r.json() : null),
         fetch('https://alfa-leetcode-api.onrender.com/Balaji_S06').then(r => r.ok ? r.json() : null),
         fetch('https://alfa-leetcode-api.onrender.com/Balaji_S06/solved').then(r => r.ok ? r.json() : null),
-        fetch('https://codechef-api.vercel.app/handle/Balaji_06').then(r => r.ok ? r.json() : null),
+        fetch('https://codechef-api.vercel.app/handle/mystic_balaji6').then(r => r.ok ? r.json() : null),
       ]);
 
       // Process GitHub
@@ -93,28 +93,28 @@ export function useDeveloperStats() {
         };
       }
 
-      // Process Codeforces (Handle: mystic_balaji6 / Balaji_06)
+      // Process Codeforces (Handle: Balaji_06)
       let codeforcesData = null;
       if (cfResult.status === 'fulfilled' && cfResult.value && cfResult.value.status === 'OK' && cfResult.value.result?.[0]) {
         const cfUser = cfResult.value.result[0];
         codeforcesData = {
-          username: 'mystic_balaji6',
+          username: 'Balaji_06',
           rating: cfUser.rating || 'Active Candidate',
           maxRating: cfUser.maxRating || 'Contest Ready',
           rank: cfUser.rank || 'Contestant',
           maxRank: cfUser.maxRank || 'Specialist',
           contribution: cfUser.contribution || 0,
-          url: 'https://codeforces.com/profile/mystic_balaji6'
+          url: 'https://codeforces.com/profile/Balaji_06'
         };
       } else {
         codeforcesData = {
-          username: 'mystic_balaji6',
+          username: 'Balaji_06',
           rating: 'Active Candidate',
           maxRating: 'Contest Ready',
           rank: 'Contestant',
           maxRank: 'Specialist',
           contribution: 0,
-          url: 'https://codeforces.com/profile/mystic_balaji6'
+          url: 'https://codeforces.com/profile/Balaji_06'
         };
       }
 
@@ -149,28 +149,28 @@ export function useDeveloperStats() {
         };
       }
 
-      // Process CodeChef (Handle: Balaji_06)
+      // Process CodeChef (Handle: mystic_balaji6)
       let codechefData = null;
       if (ccResult.status === 'fulfilled' && ccResult.value && ccResult.value.rating) {
         const cc = ccResult.value;
         codechefData = {
-          username: 'Balaji_06',
+          username: 'mystic_balaji6',
           rating: cc.currentRating || cc.rating || '1480 (2★)',
           highestRating: cc.highestRating || '1480',
           stars: cc.stars || '2★',
           globalRank: cc.globalRank ? `#${cc.globalRank}` : '#42,100',
           countryRank: cc.countryRank ? `#${cc.countryRank}` : '#14,250',
-          url: 'https://www.codechef.com/users/Balaji_06'
+          url: 'https://www.codechef.com/users/mystic_balaji6'
         };
       } else {
         codechefData = {
-          username: 'Balaji_06',
+          username: 'mystic_balaji6',
           rating: '1480 (2★)',
           highestRating: '1480',
           stars: '2★',
           globalRank: '#42,100',
           countryRank: '#14,250',
-          url: 'https://www.codechef.com/users/Balaji_06'
+          url: 'https://www.codechef.com/users/mystic_balaji6'
         };
       }
 

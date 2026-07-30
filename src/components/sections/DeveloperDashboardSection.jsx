@@ -533,7 +533,7 @@ export default function DeveloperDashboardSection() {
                 </div>
 
                 <h4 className="text-base font-bold text-neutral-100 mb-0.5">Codeforces</h4>
-                <p className="text-xs font-mono text-neutral-400 mb-4">@{cf?.username || 'Balaji_Coder06'}</p>
+                <p className="text-xs font-mono text-neutral-400 mb-4">@{cf?.username || 'Balaji_06'}</p>
 
                 <div className="space-y-3 pt-3 border-t border-neutral-800/80 text-xs">
                   <div className="flex items-center justify-between">
@@ -560,7 +560,7 @@ export default function DeveloperDashboardSection() {
               </div>
 
               <a
-                href={cf?.url || "https://codeforces.com/profile/mystic_balaji6"}
+                href={cf?.url || "https://codeforces.com/profile/Balaji_06"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-6 pt-4 border-t border-neutral-800/80 flex items-center justify-between text-xs font-mono text-cyan-400 hover:underline"
@@ -585,7 +585,7 @@ export default function DeveloperDashboardSection() {
                 </div>
 
                 <h4 className="text-base font-bold text-neutral-100 mb-0.5">CodeChef</h4>
-                <p className="text-xs font-mono text-neutral-400 mb-4">@{cc?.username || 'balaji_coder06'}</p>
+                <p className="text-xs font-mono text-neutral-400 mb-4">@{cc?.username || 'mystic_balaji6'}</p>
 
                 <div className="space-y-3 pt-3 border-t border-neutral-800/80 text-xs">
                   <div className="flex items-center justify-between">
@@ -608,7 +608,7 @@ export default function DeveloperDashboardSection() {
               </div>
 
               <a
-                href={cc?.url || "https://www.codechef.com/users/Balaji_06"}
+                href={cc?.url || "https://www.codechef.com/users/mystic_balaji6"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-6 pt-4 border-t border-neutral-800/80 flex items-center justify-between text-xs font-mono text-yellow-400 hover:underline"
